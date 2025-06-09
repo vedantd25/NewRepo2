@@ -1,11 +1,13 @@
-﻿using WebApplication1.Data;
-using WebApplication1.Models;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
+using WebApplication1.Data;
+using WebApplication1.Models;
 
 namespace WebApplication1.Controllers
 {
+    [Authorize] // Require login for all actions in this controller
     public class UrlController : Controller
     {
         private readonly AppDbContext _context;
@@ -15,19 +17,20 @@ namespace WebApplication1.Controllers
             _context = context;
         }
 
-        // Load the input form
+        // Show input form to shorten URL
         public IActionResult Index()
         {
             return View();
         }
 
-        // Handles POST request to shorten the URL
+        // Handles POST request to shorten a given URL
         [HttpPost]
         public IActionResult Shorten(string originalUrl)
         {
-            if (string.IsNullOrEmpty(originalUrl)) return RedirectToAction("Index");
+            if (string.IsNullOrEmpty(originalUrl))
+                return RedirectToAction("Index");
 
-            // ✅ Check if URL already exists
+            // Check if the same original URL is already stored
             var existing = _context.UrlMappings.FirstOrDefault(u => u.OriginalUrl == originalUrl);
             if (existing != null)
             {
@@ -35,7 +38,7 @@ namespace WebApplication1.Controllers
                 return View("Index");
             }
 
-            // ❌ Otherwise, generate a new code
+            // Generate new short code
             string code = Guid.NewGuid().ToString("n").Substring(0, 6);
 
             var mapping = new UrlMapping
@@ -51,8 +54,8 @@ namespace WebApplication1.Controllers
             return View("Index");
         }
 
-
-        // Redirects to original URL based on short code
+        // Public redirection using short URL
+        [AllowAnonymous]
         [HttpGet("/Url/Go/{code}")]
         public IActionResult Go(string code)
         {
