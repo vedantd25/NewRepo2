@@ -1,0 +1,32 @@
+﻿@{
+    ViewData["Title"] = "URL Shortener";
+}
+
+<div class="container mt-5">
+    <div class="text-center mb-4">
+        
+        <h1 class="display-5 mt-2">URL Shortener</h1>
+        <p class="lead text-muted">Paste a long URL below to get a shorter version instantly.</p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <form asp-controller="Url" asp-action="Shorten" method="post" class="d-flex">
+                <input type="text" name="originalUrl" class="form-control me-2" placeholder="Enter URL to shorten" required />
+                <button type="submit" class="btn btn-primary">Shorten</button>
+            </form>
+        </div>
+    </div>
+
+    @if (ViewBag.ShortUrl != null)
+    {
+        <div class="row justify-content-center mt-4">
+            <div class="col-md-6 text-center">
+                <h5 class="text-success">Shortened URL:</h5>
+                <a href="@ViewBag.ShortUrl" target="_blank" class="fs-5">@ViewBag.ShortUrl</a>
+            </div>
+        </div>
+    }
+
+    
+</div>
